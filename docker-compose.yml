@@ -1,0 +1,44 @@
+version: '3'
+services:
+  rabbitNode1:
+    image: rabbitmq:3-management
+    container_name: rabbitNode1
+    hostname: node1.rabbit
+    networks:
+      cluster-network:
+        ipv4_address: 192.168.0.10
+    ports:
+      - "4369:4369"
+      - "5672:5672"
+      - "15672:15672"
+      - "25672:25672"
+      - "35672:35672"
+    environment:
+      - RABBITMQ_USE_LONGNAME=true
+      - RABBITMQ_ERLANG_COOKIE=cookie
+    extra hosts:
+      - "node2.rabbit:192.168.0.11"
+
+  rabbitNode2:
+    image: rabbitmq:3-management
+    container_name: rabbitNode2
+    hostname: node2.rabbit
+    networks:
+      cluster-network:
+        ipv4_address: 192.168.0.11
+    ports:
+      - "4370:4369"
+      - "5673:5672"
+      - "15673:15672"
+      - "25673:25672"
+      - "35673:35672"
+    environment:
+      - RABBITMQ_USE_LONGNAME=true
+      - RABBITMQ_ERLANG_COOKIE=cookie
+    extra hosts:
+      - "node1.rabbit:192.168.0.10"
+  networks:
+    cluster-network:
+      ipam:
+        config:
+          - subnet: 192.168.0.0/16
