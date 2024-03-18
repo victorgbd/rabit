@@ -36,6 +36,15 @@ func main() {
 		nil,        // arguments
 	)
 	failOnError(err, "fallo al declarar la cola")
+	q2, err := ch.QueueDeclare(
+		"mensajes2", // name
+		false,       // durable
+		false,       // delete when unused
+		false,       // exclusive
+		false,       // no-wait
+		nil,         // arguments
+	)
+	failOnError(err, "fallo al declarar la cola")
 
 	db, err := sql.Open("postgres", "postgres://jheyson:laparadpieza1@64.225.48.231/rabbitdb?sslmode=disable")
 	failOnError(err, "Fallo al conectar con la base de datos")
@@ -59,21 +68,18 @@ func main() {
 			log.Printf("Mensaje recibido: %s", d.Body)
 			_, err := db.Exec("INSERT INTO mensajes (mensaje) VALUES ($1)", d.Body)
 			failOnError(err, "Fallo al insertar el mensaje en la base de datos")
+			body := "Hola Mundo"
 			err = ch.PublishWithContext(context.Background(),
-				"",     // exchange
-				q.Name, // routing key
-				false,  // mandatory
-				false,  // immediate
+				"",      // exchange
+				q2.Name, // routing key
+				false,   // mandatory
+				false,   // immediate
 				amqp.Publishing{
 					ContentType: "text/plain",
-					Body:        []byte(d.Body),
+					Body:        []byte(body),
 				})
 			failOnError(err, "fallo al publicar el mensaje")
-			fmt.Println(" [x] enviado", d.Body)
-			if err := d.Ack(false); err != nil {
-				log.Fatalf("Error al eliminar el mensaje: %v", err)
-			}
-			log.Printf("Mensaje eliminado: %s", d.Body)
+			fmt.Println(" [x] enviado a app1", body)
 		}
 	}()
 

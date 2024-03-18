@@ -34,6 +34,15 @@ func main() {
 		nil,        // arguments
 	)
 	failOnError(err, "fallo al declarar la cola")
+	q2, err := ch.QueueDeclare(
+		"mensajes2", // name
+		false,       // durable
+		false,       // delete when unused
+		false,       // exclusive
+		false,       // no-wait
+		nil,         // arguments
+	)
+	failOnError(err, "fallo al declarar la cola")
 
 	body := "Hello World!"
 	err = ch.PublishWithContext(context.Background(),
@@ -47,4 +56,23 @@ func main() {
 		})
 	failOnError(err, "fallo al publicar el mensaje")
 	fmt.Println(" [x] enviado", body)
+
+	//recibir
+	msgs, err := ch.Consume(
+		q2.Name, // queue
+		"",      // consumer
+		true,    // auto-ack
+		false,   // exclusive
+		false,   // no-local
+		false,   // no-wait
+		nil,     // args
+	)
+	failOnError(err, "fallo al registrar el consumer")
+
+	go func() {
+		for d := range msgs {
+			log.Printf("Mensaje recibido: %s", d.Body)
+		}
+	}()
+
 }
