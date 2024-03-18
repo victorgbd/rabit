@@ -4,9 +4,7 @@ services:
     image: rabbitmq:3-management
     container_name: rabbitNode1
     hostname: node1.rabbit
-    networks:
-      cluster-network:
-        ipv4_address: 192.168.0.10
+
     ports:
       - "4369:4369"
       - "5672:5672"
@@ -23,9 +21,7 @@ services:
     image: rabbitmq:3-management
     container_name: rabbitNode2
     hostname: node2.rabbit
-    networks:
-      cluster-network:
-        ipv4_address: 192.168.0.11
+
     ports:
       - "4370:4369"
       - "5673:5672"
@@ -37,8 +33,28 @@ services:
       - RABBITMQ_ERLANG_COOKIE=cookie
     extra_hosts:
       - "node1.rabbit:192.168.0.10"
-networks:
-  cluster-network:
-    ipam:
-      config:
-        - subnet: 192.168.0.0/16
+
+  postgres:
+    image: postgres:latest
+    container_name: postgres
+    environment:
+      POSTGRES_USER: jheyson
+      POSTGRES_PASSWORD: laparadpieza1
+      POSTGRES_DB: rabbitdb
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: jheyson@gmail.com
+      PGADMIN_DEFAULT_PASSWORD: laparadpieza1
+    ports:
+      - "5050:80"
+
+volumes:
+  postgres_data:
