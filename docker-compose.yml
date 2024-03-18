@@ -37,8 +37,8 @@ services:
       - RABBITMQ_ERLANG_COOKIE=cookie
     extra_hosts:
       - "node1.rabbit:192.168.0.10"
-  networks:
-    cluster-network:
-      ipam:
-        config:
-          - subnet: 192.168.0.0/16
+networks:
+  cluster-network:
+    ipam:
+      config:
+        - subnet: 192.168.0.0/16
