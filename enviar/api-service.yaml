@@ -4,8 +4,8 @@ metadata:
   annotations:
     service.beta.kubernetes.io/linode-loadbalancer-throttle: "4"
   labels:
-    app: recibir
-  name: recibir
+    app: enviar
+  name: enviar
 spec :
   type: LoadBalancer
   ports :
@@ -14,5 +14,5 @@ spec :
     protocol: TCP
     targetPort: 80
   selector:
-    app: recibir
+    app: enviar
   sessionAffinity: None
